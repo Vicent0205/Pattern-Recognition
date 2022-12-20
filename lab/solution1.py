@@ -45,7 +45,7 @@ class support_vector_machine:
         sum_terms=1-y*y_hat
         sum_terms=np.where(sum_terms<0,0,sum_terms)
         return (self.C*np.sum(sum_terms)/len(y)+sum(self.weights**2)/2)
-    def fit(self,x_train,y_train,epochs=1000,print_every_nth_epoch=100,learning_rate=0.01):
+    def fit(self,x_train,x_gaussion=[],y_train=[],epochs=1000,print_every_nth_epoch=100,learning_rate=0.01,need_process=True):
         y=y_train.copy()
         x=x_train.copy()
         self.initial=x.copy()
@@ -53,8 +53,11 @@ class support_vector_machine:
         assert x.shape[0]==y.shape[0] , "Samples of x and y don't match."
         assert x.shape[1]==self.features , "Number of Features don't match"
         
-        if(self.kernel=="gaussian"):
-            x=self.gaussian_kernel(x,x)
+        if(self.kernel=="gaussian" ):
+            if (need_process==True):
+                x=self.gaussian_kernel(x,x)
+            else:
+                x=x_gaussion
             m=x.shape[0]
             self.weights=np.zeros(m)
 
@@ -75,6 +78,7 @@ class support_vector_machine:
             self.bias-=grad_bias*learning_rate/n
             if((epoch+1)%print_every_nth_epoch==0):
                 print("--------------- Epoch {} --> Loss = {} ---------------".format(epoch+1, self.loss_function(y,y_hat)))
+        return x
     def evaluate(self,x,y):
         pred=self.predict(x)
         pred=np.where(pred==-1,0,1)
