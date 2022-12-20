@@ -6,20 +6,25 @@ from sklearn.datasets import make_classification
 from sklearn.datasets import make_circles
 from sklearn import preprocessing
 
-x, y = make_classification(n_samples=1000, n_features=2, n_redundant=0, n_informative=1,
-                             n_clusters_per_class=1, random_state=14)
-x = preprocessing.scale(x)
+df=pd.read_csv("data_for_student/train/train_data.csv",names=[i for i in range(1500)])
+df_y=pd.read_csv("data_for_student/train/label.csv",names=[i for i in range(1500)])
+#print(df.shape)
+#print(df_y.shape)
+x=df.to_numpy()
+y=df_y.to_numpy()
+x=x.T
+y=y.T
+y=y.reshape((y.shape[0],))
+y=np.where(y==0,1,-1)
 
-x_test=x[:500]
-y_test=y[:500]
-x=x[500:]
-y=y[500:]
+x_train=x[:1000]
+y_train=y[:1000]
 
-y=np.where(y==0,-1,1)
-y_test=np.where(y_test==0,-1,1)
+x_test=x[1000:]
+y_test=y[1000:]
 print(y.shape)
 print(x.shape)
-sns.scatterplot(x[:,0],x[:,1],hue=y.reshape(-1))
+#sns.scatterplot(x[:,0],x[:,1],hue=y.reshape(-1))
 # Here we solve the primal form of problem but generaly dual form of svm problem is used while using kernel trick 
 # as it is more efficient to compute predictions as alpha is non zero only for support vectors unlike weights in
 # primal form
@@ -64,7 +69,7 @@ class support_vector_machine:
         n=x.shape[0]
         
         for epoch in range(epochs):
-            y_hat=(np.dot(x,self.weights)+self.bias)
+            y_hat=(np.dot(x,self.weights)+self.bias)*y
             grad_weights=(-self.C*np.multiply(y,x.T).T+self.weights).T
             
             for weight in range(self.weights.shape[0]):
@@ -107,7 +112,30 @@ def visualize(model,title):
     plt.title(title)
     plt.show()
 if __name__=='__main__':
+    model=support_vector_machine(C=20,sigma_sq=0.01,features=600)
+    x_gaussion=[]
+    model.fit(x_train,x_gaussion, y_train,epochs=20,print_every_nth_epoch=2,learning_rate=0.01)
+    print("Training Accuracy = {}".format(model.evaluate(x_train,y_train)))
+    print("test accuracy")
+    print(model.evaluate(x_test,y_test))
+
+
+
+    x, y = make_classification(n_samples=1000, n_features=2, n_redundant=0, n_informative=1,
+                             n_clusters_per_class=1, random_state=14)
+    x = preprocessing.scale(x)
+
+    x_test=x[:500]
+    y_test=y[:500]
+    x=x[500:]
+    y=y[500:]
+
+    y=np.where(y==0,-1,1)
+    y_test=np.where(y_test==0,-1,1)
     model=support_vector_machine(C=20,sigma_sq=0.01)
-    model.fit(x,y,epochs=20,print_every_nth_epoch=2,learning_rate=0.01)
+    model.fit(x,[],y,epochs=20,print_every_nth_epoch=2,learning_rate=0.01)
     print("Training Accuracy = {}".format(model.evaluate(x,y)))
-    visualize(model,"Vanilla SVM")
+    print("test accuracy")
+    print(model.evaluate(x_test,y_test))   
+
+    

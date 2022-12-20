@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 
 class col_svm:  
-    def __init__(self,C=10,features=600,sigma_sq=0.1,kernel="gaussian"):
+    def __init__(self,C=10,features=600,sigma_sq=0.1,kernel="None"):
 
         data,y=self.get_data()
         self.C=C
@@ -41,24 +41,36 @@ class col_svm:
         self.svm2.fit(x_train=x0,x_gaussion= gaussion_x,y_train= y2,epochs=20,print_every_nth_epoch=2,learning_rate=0.01,need_process=False)
         #print("Training Accuracy = {}".format(self.svm2.evaluate(x2,y2)))
 
-        self.get_accuracy()
+        #self.get_accuracy()
 
     def get_data(self):
         df=pd.read_csv("data_for_student/train/train_data.csv",names=[i for i in range(1500)])
         df_y=pd.read_csv("data_for_student/train/label.csv",names=[i for i in range(1500)])
-        print(df.shape)
-        print(df_y.shape)
+        #print(df.shape)
+        #print(df_y.shape)
         data=df.to_numpy()
         y=df_y.to_numpy()
         data=data.T
         y=y.T
         y=y.reshape((y.shape[0],))
+
+        data=data[:1000]
+        y=y[:1000]
+        print(data.shape)
+        print(y.shape)
         return data,y
     
     def predict(self,x):
         y0=self.svm0.predictPure(x)
+        print("y0")
+        print(y0)
         y1=self.svm1.predictPure(x)
+        print("y1")
+        print(y1)
         y2=self.svm2.predictPure(x)
+        print("y2")
+        print(y2)
+
         ans=[]
         n=y0.shape[0]
         for i in range(n):
@@ -70,7 +82,8 @@ class col_svm:
             if(y2[i]>largeNum):
                 temp=2
             ans.append(temp)
-        
+        print("ans")
+        print(ans)
         return np.array(ans)
 
     def predictPure(self,x):
@@ -137,6 +150,30 @@ class col_svm:
         ans=np.where(output==self.label,1,0)
         n=ans.shape[0]
         print("accuarcy  "+str(np.sum(ans)/n))
+
+    def test_accuracy(self,x,y):
+        output=self.predict(x)
+        ans=np.where(output==y,1,0)
+        n=ans.shape[0]
+        print("accuarcy  "+str(np.sum(ans)/n))
 if __name__=='__main__':
+
     svm=col_svm()
     svm.get_accuracy()
+
+    df=pd.read_csv("data_for_student/train/train_data.csv",names=[i for i in range(1500)])
+    df_y=pd.read_csv("data_for_student/train/label.csv",names=[i for i in range(1500)])
+    #print(df.shape)
+    #print(df_y.shape)
+    data=df.to_numpy()
+    y=df_y.to_numpy()
+    data=data.T
+    y=y.T
+    y=y.reshape((y.shape[0],))
+
+    data=data[1000:]
+    y=y[1000:]
+    print(data.shape)
+    print(y.shape)
+    
+    svm.test_accuracy(data,y)
