@@ -18,15 +18,40 @@ while(True):
     y=svm.predictPure(data)
     y_label=y[0]
     y_confi=y[1]
-    putIndex=np.where(y_confi>threshold)
+    print("mean "+str(np.mean(y_confi)))
+    print("max "+str(np.max(y_confi)) )
+    print("min "+str(np.min(y_confi)) )
+    threshold=np.mean(y_confi)
+    putIndex=np.where(y_confi>threshold)[0]
     putData=data[putIndex]
     putY=y_label[putIndex]
     print("put num "+str(putIndex.shape[0]))
-    col_svm.add_data(putData,putY)
+    svm.add_data(putData,putY)
 
     n=y.shape[0]
     remainIndex=list(set([i for i in range(n)])-set(putIndex))
     data=data[remainIndex]
+    print("data shape")
+    print(data.shape)
+
+
+df=pd.read_csv("data_for_student/train/train_data.csv",names=[i for i in range(1500)])
+df_y=pd.read_csv("data_for_student/train/label.csv",names=[i for i in range(1500)])
+#print(df.shape)
+#print(df_y.shape)
+data=df.to_numpy()
+y=df_y.to_numpy()
+data=data.T
+y=y.T
+y=y.reshape((y.shape[0],))
+
+data=data[ 1: :2]
+y=y[1: :2]
+print(data.shape)
+print(y.shape)
+
+svm.test_accuracy(data,y)
+
 np.savetxt("svm0w.txt",svm.svm0.weights)
 np.savetxt("svm0w.txt",[svm.svm0.bias])
 np.savetxt("svm1w.txt",svm.svm1.weights)

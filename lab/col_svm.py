@@ -54,8 +54,8 @@ class col_svm:
         y=y.T
         y=y.reshape((y.shape[0],))
 
-        data=data[:1000]
-        y=y[:1000]
+        data=data[::2]
+        y=y[::2]
         print(data.shape)
         print(y.shape)
         return data,y
@@ -63,13 +63,13 @@ class col_svm:
     def predict(self,x):
         y0=self.svm0.predictPure(x)
         print("y0")
-        print(y0)
+        #print(y0)
         y1=self.svm1.predictPure(x)
         print("y1")
-        print(y1)
+        #print(y1)
         y2=self.svm2.predictPure(x)
         print("y2")
-        print(y2)
+        #print(y2)
 
         ans=[]
         n=y0.shape[0]
@@ -82,8 +82,8 @@ class col_svm:
             if(y2[i]>largeNum):
                 temp=2
             ans.append(temp)
-        print("ans")
-        print(ans)
+        #print("ans")
+        #print(ans)
         return np.array(ans)
 
     def predictPure(self,x):
@@ -113,7 +113,7 @@ class col_svm:
         x0=data.copy()
         #y0=y.copy()
         y0=np.where(y==0,1,-1)
-        print(y0)
+        #print(y0)
         #y0=y0.reshape((y0.shape[0],))
         self.svm0=support_vector_machine(self.C,self.features,self.sigma_sq,self.kernel)
         gaussion_x=self.svm0.fit(x_train= x0,y_train= y0,epochs=20,print_every_nth_epoch=2,learning_rate=0.01,need_process=True)
@@ -171,8 +171,8 @@ if __name__=='__main__':
     y=y.T
     y=y.reshape((y.shape[0],))
 
-    data=data[1000:]
-    y=y[1000:]
+    data=data[ 1: :2]
+    y=y[1: :2]
     print(data.shape)
     print(y.shape)
     
